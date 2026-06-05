@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - ChamaLedger{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <h1 class="text-3xl font-bold text-gray-800">Dashboard</h1>
+    
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Members -->
+        <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Total Members</p>
+                    <p class="text-3xl font-bold text-gray-800">{{ stats.total_members }}</p>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <i class="fas fa-users text-blue-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Total Contributions -->
+        <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Total Contributions</p>
+                    <p class="text-3xl font-bold text-green-600">KES {{ stats.total_contributions|round|int }}</p>
+                </div>
+                <div class="bg-green-100 p-3 rounded-full">
+                    <i class="fas fa-money-bill-wave text-green-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Current Balance -->
+        <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Current Balance</p>
+                    <p class="text-3xl font-bold text-purple-600">KES {{ stats.current_balance|round|int }}</p>
+                </div>
+                <div class="bg-purple-100 p-3 rounded-full">
+                    <i class="fas fa-wallet text-purple-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Active Loans -->
+        <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Active Loans</p>
+                    <p class="text-3xl font-bold text-orange-600">KES {{ stats.total_loan_balance|round|int }}</p>
+                </div>
+                <div class="bg-orange-100 p-3 rounded-full">
+                    <i class="fas fa-hand-holding-usd text-orange-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Second Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <p class="text-gray-500 text-sm">Total Payouts</p>
+            <p class="text-2xl font-bold text-red-600">KES {{ stats.total_payouts|round|int }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <p class="text-gray-500 text-sm">Total Expenses</p>
+            <p class="text-2xl font-bold text-gray-800">KES {{ stats.total_expenses|round|int }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <p class="text-gray-500 text-sm">Unpaid Fines</p>
+            <p class="text-2xl font-bold text-red-600">KES {{ stats.total_unpaid_fines|round|int }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <p class="text-gray-500 text-sm">Pending Loans</p>
+            <p class="text-2xl font-bold text-yellow-600">{{ stats.pending_loans }}</p>
+        </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Recent Contributions -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Recent Contributions</h2>
+            <div class="space-y-3">
+                {% for contrib in stats.recent_contributions[:5] %}
+                <div class="flex justify-between items-center border-b pb-2">
+                    <div>
+                        <p class="font-medium">{{ contrib.member_name }}</p>
+                        <p class="text-xs text-gray-500">{{ contrib.contribution_date }}</p>
+                    </div>
+                    <p class="font-bold text-green-600">+KES {{ contrib.amount }}</p>
+                </div>
+                {% else %}
+                <p class="text-gray-500 text-center">No contributions yet</p>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Upcoming Meetings -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Upcoming Meetings</h2>
+            <div class="space-y-3">
+                {% for meeting in stats.upcoming_meetings[:3] %}
+                <div class="flex justify-between items-center border-b pb-2">
+                    <div>
+                        <p class="font-medium">{{ meeting.venue }}</p>
+                        <p class="text-xs text-gray-500">{{ meeting.meeting_date }}</p>
+                    </div>
+                    <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded">{{ meeting.status }}</span>
+                </div>
+                {% else %}
+                <p class="text-gray-500 text-center">No upcoming meetings</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

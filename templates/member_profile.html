@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}{{ member_data.member.name }} - ChamaLedger{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">{{ member_data.member.name }}</h1>
+            <p class="text-gray-500 mt-1">Member No: <span class="font-mono font-semibold">{{ member_data.member.member_number }}</span></p>
+        </div>
+        <div>
+            {% if session.role == 'treasurer' %}
+            <a href="{{ url_for('edit_member', member_id=member_data.member.id) }}" class="btn-primary mr-2">
+                <i class="fas fa-edit mr-2"></i> Edit
+            </a>
+            {% endif %}
+            <a href="{{ url_for('members') if session.role == 'treasurer' else url_for('member_dashboard') }}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400">
+                <i class="fas fa-arrow-left mr-2"></i> Back
+            </a>
+        </div>
+    </div>
+    
+    <!-- Member Info Card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Member Information</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <p class="text-sm text-gray-500">Member Number</p>
+                <p class="text-lg font-semibold font-mono">{{ member_data.member.member_number }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Phone</p>
+                <p class="text-lg font-semibold">{{ member_data.member.phone or 'Not provided' }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Email</p>
+                <p class="text-lg font-semibold">{{ member_data.member.email or 'Not provided' }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Join Date</p>
+                <p class="text-lg font-semibold">{{ member_data.member.join_date or 'Not provided' }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Status</p>
+                <span class="badge {% if member_data.member.status == 'active' %}badge-success{% else %}badge-danger{% endif %}">
+                    {{ member_data.member.status }}
+                </span>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Current Balance</p>
+                <p class="text-2xl font-bold {% if member_data.member.current_balance >= 0 %}text-emerald-600{% else %}text-red-600{% endif %}">
+                    KES {{ "{:,.0f}".format(member_data.member.current_balance) }}
+                </p>
+            </div>
+        </div>
+        
+        {% if member_data.member.notes %}
+        <div class="mt-4 pt-4 border-t">
+            <p class="text-sm text-gray-500">Notes</p>
+            <p class="text-gray-700">{{ member_data.member.notes }}</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Contributions -->
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        <div class="bg-gray-50 px-6 py-3 border-b">
+            <h2 class="text-lg font-bold text-gray-700">Contribution History</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-2 px-4">Date</th>
+                        <th class="text-right py-2 px-4">Amount</th>
+                        <th class="text-left py-2 px-4">Method</th>
+                        <th class="text-left py-2 px-4">Receipt No.</th>
+                        <th class="text-left py-2 px-4">Recorded By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contrib in member_data.contributions[:20] %}
+                    <tr class="border-t">
+                        <td class="py-2 px-4">{{ contrib.contribution_date }}</td>
+                        <td class="py-2 px-4 text-right font-bold text-emerald-600">KES {{ "{:,.0f}".format(contrib.amount) }}</td>
+                        <td class="py-2 px-4">{{ contrib.payment_method|title }}</td>
+                        <td class="py-2 px-4">{{ contrib.receipt_number }}</td>
+                        <td class="py-2 px-4">{{ contrib.recorded_by or '-' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr class="border-t">
+                        <td colspan="5" class="text-center text-gray-500 py-6">No contributions recorded yet</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Fines -->
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        <div class="bg-gray-50 px-6 py-3 border-b">
+            <h2 class="text-lg font-bold text-gray-700">Fines</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-2 px-4">Date</th>
+                        <th class="text-left py-2 px-4">Reason</th>
+                        <th class="text-right py-2 px-4">Amount</th>
+                        <th class="text-left py-2 px-4">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fine in member_data.fines %}
+                    <tr class="border-t">
+                        <td class="py-2 px-4">{{ fine.created_at.strftime('%Y-%m-%d') if fine.created_at else '-' }}</td>
+                        <td class="py-2 px-4">{{ fine.reason }}</td>
+                        <td class="py-2 px-4 text-right text-red-600">KES {{ "{:,.0f}".format(fine.amount) }}</td>
+                        <td class="py-2 px-4">
+                            {% if fine.paid_status %}
+                            <span class="badge badge-success">Paid</span>
+                            {% else %}
+                            <span class="badge badge-danger">Unpaid</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr class="border-t">
+                        <td colspan="4" class="text-center text-gray-500 py-6">No fines recorded</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Loans -->
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        <div class="bg-gray-50 px-6 py-3 border-b">
+            <h2 class="text-lg font-bold text-gray-700">Loans</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-2 px-4">Issue Date</th>
+                        <th class="text-right py-2 px-4">Amount</th>
+                        <th class="text-right py-2 px-4">Paid</th>
+                        <th class="text-right py-2 px-4">Remaining</th>
+                        <th class="text-left py-2 px-4">Status</th>
+                        <th class="text-left py-2 px-4">Due Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loan in member_data.loans %}
+                    <tr class="border-t">
+                        <td class="py-2 px-4">{{ loan.issue_date }}</td>
+                        <td class="py-2 px-4 text-right">KES {{ "{:,.0f}".format(loan.loan_amount) }}</td>
+                        <td class="py-2 px-4 text-right">KES {{ "{:,.0f}".format(loan.amount_paid) }}</td>
+                        <td class="py-2 px-4 text-right text-red-600">KES {{ "{:,.0f}".format(loan.remaining_balance) }}</td>
+                        <td class="py-2 px-4">
+                            {% if loan.status == 'pending' %}
+                            <span class="badge badge-warning">Pending</span>
+                            {% elif loan.status == 'approved' %}
+                            <span class="badge badge-success">Active</span>
+                            {% elif loan.status == 'completed' %}
+                            <span class="badge badge-info">Completed</span>
+                            {% else %}
+                            <span class="badge badge-danger">Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-2 px-4">{{ loan.due_date }}</td>
+                    </tr>
+                    {% else %}
+                    <tr class="border-t">
+                        <td colspan="6" class="text-center text-gray-500 py-6">No loans recorded</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Payouts -->
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        <div class="bg-gray-50 px-6 py-3 border-b">
+            <h2 class="text-lg font-bold text-gray-700">Payouts</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-2 px-4">Request Date</th>
+                        <th class="text-right py-2 px-4">Amount</th>
+                        <th class="text-left py-2 px-4">Purpose</th>
+                        <th class="text-left py-2 px-4">Status</th>
+                        <th class="text-left py-2 px-4">Approved By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payout in member_data.payouts %}
+                    <tr class="border-t">
+                        <td class="py-2 px-4">{{ payout.created_at.strftime('%Y-%m-%d') if payout.created_at else '-' }}</td>
+                        <td class="py-2 px-4 text-right">KES {{ "{:,.0f}".format(payout.amount) }}</td>
+                        <td class="py-2 px-4">{{ payout.purpose }}</td>
+                        <td class="py-2 px-4">
+                            {% if payout.status == 'pending' %}
+                            <span class="badge badge-warning">Pending</span>
+                            {% elif payout.status == 'approved' %}
+                            <span class="badge badge-success">Approved</span>
+                            {% else %}
+                            <span class="badge badge-danger">Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-2 px-4">{{ payout.approved_by or '-' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr class="border-t">
+                        <td colspan="5" class="text-center text-gray-500 py-6">No payout requests</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

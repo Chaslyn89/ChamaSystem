@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}My Loans - ChamaLedger{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">My Loans</h1>
+        <a href="{{ url_for('request_loan_view') }}" class="btn-primary">
+            <i class="fas fa-plus mr-2"></i> Request New Loan
+        </a>
+    </div>
+    
+    <!-- Pending Loans -->
+    {% set pending_loans = loans|selectattr('status', 'equalto', 'pending')|list %}
+    {% if pending_loans %}
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        <div class="bg-yellow-50 px-6 py-4 border-b">
+            <h2 class="text-lg font-bold text-yellow-700">Pending Requests</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-3 px-4">Request Date</th>
+                        <th class="text-right py-3 px-4">Amount</th>
+                        <th class="text-right py-3 px-4">Interest</th>
+                        <th class="text-right py-3 px-4">Total Due</th>
+                        <th class="text-left py-3 px-4">Due Date</th>
+                        <th class="text-left py-3 px-4">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loan in pending_loans %}
+                    <tr class="border-t">
+                        <td class="py-3 px-4">{{ loan.issue_date }}</td>
+                        <td class="py-3 px-4 text-right">KES {{ "{:,.0f}".format(loan.loan_amount) }}</td>
+                        <td class="py-3 px-4 text-right">{{ loan.interest_rate }}%</td>
+                        <td class="py-3 px-4 text-right">KES {{ "{:,.0f}".format(loan.amount_due) }}</td>
+                        <td class="py-3 px-4">{{ loan.due_date }}</td>
+                        <td class="py-3 px-4">
+                            <span class="badge badge-warning">Pending Approval</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Active Loans -->
+    {% set active_loans = loans|selectattr('status', 'equalto', 'approved')|list %}
+    {% if active_loans %}
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        <div class="bg-green-50 px-6 py-4 border-b">
+            <h2 class="text-lg font-bold text-green-700">Active Loans</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-3 px-4">Issue Date</th>
+                        <th class="text-right py-3 px-4">Amount</th>
+                        <th class="text-right py-3 px-4">Paid</th>
+                        <th class="text-right py-3 px-4">Remaining</th>
+                        <th class="text-left py-3 px-4">Due Date</th>
+                        <th class="text-left py-3 px-4">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loan in active_loans %}
+                    <tr class="border-t">
+                        <td class="py-3 px-4">{{ loan.issue_date }}</td>
+                        <td class="py-3 px-4 text-right">KES {{ "{:,.0f}".format(loan.loan_amount) }}</td>
+                        <td class="py-3 px-4 text-right">KES {{ "{:,.0f}".format(loan.amount_paid) }}</td>
+                        <td class="py-3 px-4 text-right text-red-600">KES {{ "{:,.0f}".format(loan.remaining_balance) }}</td>
+                        <td class="py-3 px-4">{{ loan.due_date }}</td>
+                        <td class="py-3 px-4">
+                            <form method="POST" action="{{ url_for('repay_loan_view', loan_id=loan.id) }}" class="flex gap-2">
+                                <input type="number" name="amount" placeholder="Amount" class="w-28 border border-gray-300 rounded-lg px-2 py-1 text-sm" required>
+                                <button type="submit" class="bg-emerald-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-emerald-700">Repay</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Completed / Rejected Loans -->
+    {% set old_loans = loans|rejectattr('status', 'in', ['pending', 'approved'])|list %}
+    {% if old_loans %}
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        <div class="bg-gray-50 px-6 py-4 border-b">
+            <h2 class="text-lg font-bold text-gray-700">Loan History</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-3 px-4">Issue Date</th>
+                        <th class="text-right py-3 px-4">Amount</th>
+                        <th class="text-left py-3 px-4">Status</th>
+                        <th class="text-left py-3 px-4">Due Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loan in old_loans %}
+                    <tr class="border-t">
+                        <td class="py-3 px-4">{{ loan.issue_date }}</td>
+                        <td class="py-3 px-4 text-right">KES {{ "{:,.0f}".format(loan.loan_amount) }}</td>
+                        <td class="py-3 px-4">
+                            {% if loan.status == 'completed' %}
+                            <span class="badge badge-success">Completed</span>
+                            {% else %}
+                            <span class="badge badge-danger">Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4">{{ loan.due_date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if not pending_loans and not active_loans and not old_loans %}
+    <div class="bg-white rounded-2xl shadow-sm p-8 text-center border border-gray-100">
+        <i class="fas fa-hand-holding-usd text-5xl text-gray-300 mb-3"></i>
+        <p class="text-gray-500">You have no loan records.</p>
+        <a href="{{ url_for('request_loan_view') }}" class="text-emerald-600 hover:underline mt-2 inline-block">Request your first loan</a>
+    </div>
+    {% endif %}
+    
+    <div class="mt-4">
+        <a href="{{ url_for('member_dashboard') }}" class="text-emerald-600 hover:underline">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

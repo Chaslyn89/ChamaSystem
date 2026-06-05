@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Request Loan - ChamaLedger{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Request Loan</h1>
+    
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <form method="POST" id="loanForm">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Member *</label>
+                    <select name="member_id" required class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                        <option value="">Select Member</option>
+                        {% for member in members %}
+                        <option value="{{ member.id }}">{{ member.name }} (Balance: KES {{ member.current_balance }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Loan Amount (KES) *</label>
+                    <input type="number" name="loan_amount" id="loan_amount" required min="1" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                    <p class="text-xs text-gray-500 mt-1" id="amountWarning"></p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Interest Rate (%) *</label>
+                    <input type="number" name="interest_rate" id="interest_rate" required min="0" value="10" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                    <p class="text-xs text-gray-500 mt-1">Default is 10%</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Due Date *</label>
+                    <input type="date" name="due_date" id="due_date" required class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                    <p class="text-xs text-red-500 mt-1" id="dateWarning"></p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Notes (Optional)</label>
+                    <textarea name="notes" rows="3" placeholder="Reason for loan, repayment plan..." class="w-full border border-gray-300 rounded-lg px-4 py-2"></textarea>
+                </div>
+                
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="btn-primary">Submit Request</button>
+                    <a href="{{ url_for('loans') }}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Set min date to TODAY for due date (cannot borrow with past due date)
+    const today = new Date().toISOString().split('T')[0];
+    const dueDateInput = document.getElementById('due_date');
+    dueDateInput.setAttribute('min', today);
+    
+    // Validate due date on change
+    dueDateInput.addEventListener('change', function() {
+        const selectedDate = this.value;
+        const dateWarning = document.getElementById('dateWarning');
+        if (selectedDate < today) {
+            dateWarning.textContent = 'Due date cannot be in the past!';
+            this.value = '';
+        } else {
+            dateWarning.textContent = '';
+        }
+    });
+    
+    // Validate loan amount
+    const amountInput = document.getElementById('loan_amount');
+    amountInput.addEventListener('change', function() {
+        const amountWarning = document.getElementById('amountWarning');
+        if (this.value < 1) {
+            amountWarning.textContent = 'Loan amount must be at least KES 1';
+            this.value = 1;
+        } else {
+            amountWarning.textContent = '';
+        }
+    });
+    
+    // Validate interest rate
+    const interestInput = document.getElementById('interest_rate');
+    interestInput.addEventListener('change', function() {
+        if (this.value < 0) {
+            this.value = 0;
+        }
+    });
+</script>
+{% endblock %}

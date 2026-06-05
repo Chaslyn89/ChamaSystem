@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Member Statement - ChamaLedger{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">Member Statement</h1>
+        <button onclick="window.print()" class="btn-primary">
+            <i class="fas fa-print mr-2"></i> Print
+        </button>
+    </div>
+    
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <!-- Member Info -->
+        <div class="border-b pb-4 mb-4">
+            <h2 class="text-xl font-bold">{{ statement.member_name }}</h2>
+            <p class="text-gray-600">Member No: {{ statement.member_number or 'Not provided' }}</p>
+            <p class="text-gray-600">Phone: {{ statement.member_phone or 'Not provided' }}</p>
+            <p class="text-gray-600">Email: {{ statement.member_email or 'Not provided' }}</p>
+            <p class="text-lg font-bold mt-2">Current Balance: 
+                <span class="{% if statement.current_balance >= 0 %}text-emerald-600{% else %}text-red-600{% endif %}">
+                    KES {{ "{:,.0f}".format(statement.current_balance|default(0)) }}
+                </span>
+            </p>
+        </div>
+        
+        <p class="text-gray-500 mb-4">Period: {{ statement.start_date }} to {{ statement.end_date }}</p>
+        
+        <!-- Transactions -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-2 px-3">Date</th>
+                        <th class="text-left py-2 px-3">Type</th>
+                        <th class="text-left py-2 px-3">Description</th>
+                        <th class="text-right py-2 px-3">Amount (KES)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for trans in statement.transactions %}
+                    <tr class="border-t">
+                        <td class="py-2 px-3">{{ trans.date }}</td>
+                        <td class="py-2 px-3">
+                            {% if trans.type == 'contribution' %}
+                            <span class="badge badge-success">Contribution</span>
+                            {% elif trans.type == 'fine' %}
+                            <span class="badge badge-danger">Fine</span>
+                            {% else %}
+                            <span class="badge badge-warning">Payout</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-2 px-3">
+                            {% if trans.type == 'contribution' %}
+                            Receipt: {{ trans.reference }}
+                            {% elif trans.type == 'fine' %}
+                            {{ trans.reference }}
+                            {% else %}
+                            {{ trans.reference }}
+                            {% endif %}
+                        </td>
+                        <td class="py-2 px-3 text-right {% if trans.type == 'contribution' %}text-emerald-600{% else %}text-red-600{% endif %}">
+                            {% if trans.type == 'contribution' %}+{% else %}-{% endif %} KES {{ "{:,.0f}".format(trans.amount|default(0)) }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr class="border-t">
+                        <td colspan="4" class="text-center text-gray-500 py-8">No transactions in this period</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-6">
+            <a href="{{ url_for('member_dashboard') }}" class="text-emerald-600 hover:underline">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

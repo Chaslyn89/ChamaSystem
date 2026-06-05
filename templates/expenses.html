@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Expenses - ChamaLedger{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">Expenses</h1>
+        <a href="{{ url_for('add_expense_view') }}" class="btn-primary">
+            <i class="fas fa-plus mr-2"></i> Add Expense
+        </a>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-3 px-4">Date</th>
+                        <th class="text-left py-3 px-4">Category</th>
+                        <th class="text-left py-3 px-4">Description</th>
+                        <th class="text-right py-3 px-4">Amount (KES)</th>
+                        <th class="text-left py-3 px-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                    <tr class="border-t">
+                        <td class="py-3 px-4">{{ expense.expense_date }}</td>
+                        <td class="py-3 px-4">{{ expense.category }}</td>
+                        <td class="py-3 px-4">{{ expense.description }}</td>
+                        <td class="py-3 px-4 text-right font-bold text-red-600">{{ "{:,.0f}".format(expense.amount) }}</td>
+                        <td class="py-3 px-4">
+                            <form method="POST" action="{{ url_for('delete_expense_view', expense_id=expense.id) }}" style="display:inline;" onsubmit="return confirm('Delete this expense?')">
+                                <button type="submit" class="text-red-600 hover:text-red-800">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-gray-500 py-8">No expenses yet. <a href="{{ url_for('add_expense_view') }}" class="text-blue-600">Add your first expense</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Payouts - ChamaLedger{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">Payouts</h1>
+        <a href="{{ url_for('request_payout_view') }}" class="btn-primary">
+            <i class="fas fa-plus mr-2"></i> Request Payout
+        </a>
+    </div>
+    
+    <!-- Pending Payouts -->
+    {% if pending %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-yellow-50 px-4 py-3 border-b">
+            <h2 class="text-lg font-bold text-yellow-700">Pending Requests</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-2 px-3">Member</th>
+                        <th class="text-right py-2 px-3">Amount</th>
+                        <th class="text-left py-2 px-3">Purpose</th>
+                        <th class="text-left py-2 px-3">Request Date</th>
+                        <th class="text-left py-2 px-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payout in pending %}
+                    <tr class="border-t">
+                        <td class="py-2 px-3">{{ payout.member_name }}</td>
+                        <td class="py-2 px-3 text-right font-bold">KES {{ "{:,.0f}".format(payout.amount) }}</td>
+                        <td class="py-2 px-3">{{ payout.purpose }}</td>
+                        <td class="py-2 px-3">{{ payout.created_at }}</td>
+                        <td class="py-2 px-3">
+                            <form method="POST" action="{{ url_for('approve_payout_view', payout_id=payout.id) }}" style="display:inline;">
+                                <button type="submit" class="bg-green-500 text-white px-2 py-1 rounded text-sm hover:bg-green-600">Approve</button>
+                            </form>
+                            <form method="POST" action="{{ url_for('reject_payout_view', payout_id=payout.id) }}" style="display:inline;">
+                                <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- All Payouts -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-gray-50 px-4 py-3 border-b">
+            <h2 class="text-lg font-bold text-gray-700">All Payouts History</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-2 px-3">Member</th>
+                        <th class="text-right py-2 px-3">Amount</th>
+                        <th class="text-left py-2 px-3">Purpose</th>
+                        <th class="text-left py-2 px-3">Status</th>
+                        <th class="text-left py-2 px-3">Approved By</th>
+                        <th class="text-left py-2 px-3">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payout in payouts %}
+                    <tr class="border-t">
+                        <td class="py-2 px-3">{{ payout.member_name }}</td>
+                        <td class="py-2 px-3 text-right font-bold">KES {{ "{:,.0f}".format(payout.amount) }}</td>
+                        <td class="py-2 px-3">{{ payout.purpose }}</td>
+                        <td class="py-2 px-3">
+                            {% if payout.status == 'pending' %}
+                            <span class="badge badge-warning">Pending</span>
+                            {% elif payout.status == 'approved' %}
+                            <span class="badge badge-success">Approved</span>
+                            {% else %}
+                            <span class="badge badge-danger">Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-2 px-3">{{ payout.approved_by or '-' }}</td>
+                        <td class="py-2 px-3">{{ payout.payout_date or payout.created_at }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-gray-500 py-4">No payout records</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

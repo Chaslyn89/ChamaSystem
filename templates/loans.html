@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Loans - ChamaLedger{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">Loans</h1>
+        <a href="{{ url_for('request_loan_view') }}" class="btn-primary">
+            <i class="fas fa-plus mr-2"></i> Request Loan
+        </a>
+    </div>
+    
+    <!-- Loan Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-white rounded-lg shadow-md p-4">
+            <p class="text-sm text-gray-500">Total Requested</p>
+            <p class="text-xl font-bold text-blue-600">KES {{ "{:,.0f}".format(summary.total_requested) }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-4">
+            <p class="text-sm text-gray-500">Total Approved</p>
+            <p class="text-xl font-bold text-green-600">KES {{ "{:,.0f}".format(summary.total_approved) }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-4">
+            <p class="text-sm text-gray-500">Outstanding Balance</p>
+            <p class="text-xl font-bold text-orange-600">KES {{ "{:,.0f}".format(summary.total_outstanding) }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-4">
+            <p class="text-sm text-gray-500">Total Repaid</p>
+            <p class="text-xl font-bold text-green-600">KES {{ "{:,.0f}".format(summary.total_repaid) }}</p>
+        </div>
+    </div>
+    
+    <!-- Pending Loans -->
+    {% if pending %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-yellow-50 px-4 py-3 border-b">
+            <h2 class="text-lg font-bold text-yellow-700">Pending Loan Requests</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-2 px-3">Member</th>
+                        <th class="text-right py-2 px-3">Amount</th>
+                        <th class="text-right py-2 px-3">Interest</th>
+                        <th class="text-right py-2 px-3">Amount Due</th>
+                        <th class="text-left py-2 px-3">Due Date</th>
+                        <th class="text-left py-2 px-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loan in pending %}
+                    <tr class="border-t">
+                        <td class="py-2 px-3">{{ loan.member_name }}</td>
+                        <td class="py-2 px-3 text-right">KES {{ "{:,.0f}".format(loan.loan_amount) }}</td>
+                        <td class="py-2 px-3 text-right">{{ loan.interest_rate }}%</td>
+                        <td class="py-2 px-3 text-right">KES {{ "{:,.0f}".format(loan.amount_due) }}</td>
+                        <td class="py-2 px-3">{{ loan.due_date }}</td>
+                        <td class="py-2 px-3">
+                            <form method="POST" action="{{ url_for('approve_loan_view', loan_id=loan.id) }}" style="display:inline;">
+                                <button type="submit" class="bg-green-500 text-white px-2 py-1 rounded text-sm hover:bg-green-600">Approve</button>
+                            </form>
+                            <form method="POST" action="{{ url_for('reject_loan_view', loan_id=loan.id) }}" style="display:inline;">
+                                <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">Reject</button>
+                            </form>
+                        </td>
+                     </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Active Loans -->
+    {% if active %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-green-50 px-4 py-3 border-b">
+            <h2 class="text-lg font-bold text-green-700">Active Loans</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-2 px-3">Member</th>
+                        <th class="text-right py-2 px-3">Amount</th>
+                        <th class="text-right py-2 px-3">Paid</th>
+                        <th class="text-right py-2 px-3">Remaining</th>
+                        <th class="text-left py-2 px-3">Due Date</th>
+                        <th class="text-left py-2 px-3">Action</th>
+                     </tr>
+                </thead>
+                <tbody>
+                    {% for loan in active %}
+                    <tr class="border-t">
+                        <td class="py-2 px-3">{{ loan.member_name }}</td>
+                        <td class="py-2 px-3 text-right">KES {{ "{:,.0f}".format(loan.loan_amount) }}</td>
+                        <td class="py-2 px-3 text-right">KES {{ "{:,.0f}".format(loan.amount_paid) }}</td>
+                        <td class="py-2 px-3 text-right text-red-600">KES {{ "{:,.0f}".format(loan.remaining_balance) }}</td>
+                        <td class="py-2 px-3">{{ loan.due_date }}</td>
+                        <td class="py-2 px-3">
+                            <form method="POST" action="{{ url_for('repay_loan_view', loan_id=loan.id) }}" class="repay-form" data-loan-id="{{ loan.id }}">
+                                <input type="number" name="amount" placeholder="Amount" class="repay-amount w-24 border rounded px-1 py-1 text-sm" required>
+                                <button type="submit" class="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600">Repay</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- All Loans -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-gray-50 px-4 py-3 border-b">
+            <h2 class="text-lg font-bold text-gray-700">All Loans History</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-2 px-3">Member</th>
+                        <th class="text-right py-2 px-3">Amount</th>
+                        <th class="text-right py-2 px-3">Interest</th>
+                        <th class="text-right py-2 px-3">Amount Due</th>
+                        <th class="text-right py-2 px-3">Paid</th>
+                        <th class="text-left py-2 px-3">Status</th>
+                        <th class="text-left py-2 px-3">Due Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loan in loans %}
+                    <tr class="border-t">
+                        <td class="py-2 px-3">{{ loan.member_name }}</td>
+                        <td class="py-2 px-3 text-right">KES {{ "{:,.0f}".format(loan.loan_amount) }}</td>
+                        <td class="py-2 px-3 text-right">{{ loan.interest_rate }}%</td>
+                        <td class="py-2 px-3 text-right">KES {{ "{:,.0f}".format(loan.amount_due) }}</td>
+                        <td class="py-2 px-3 text-right">KES {{ "{:,.0f}".format(loan.amount_paid) }}</td>
+                        <td class="py-2 px-3">
+                            {% if loan.status == 'pending' %}
+                            <span class="badge badge-warning">Pending</span>
+                            {% elif loan.status == 'approved' %}
+                            <span class="badge badge-success">Active</span>
+                            {% elif loan.status == 'completed' %}
+                            <span class="badge badge-info">Completed</span>
+                            {% else %}
+                            <span class="badge badge-danger">Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-2 px-3">{{ loan.due_date }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-gray-500 py-4">No loan records</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Repayment validation - cannot repay with future date
+    const today = new Date().toISOString().split('T')[0];
+    
+    document.querySelectorAll('.repay-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const amountInput = this.querySelector('.repay-amount');
+            const amount = parseFloat(amountInput.value);
+            
+            if (isNaN(amount) || amount <= 0) {
+                e.preventDefault();
+                alert('Please enter a valid repayment amount');
+                return false;
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Fines - ChamaLedger{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">Fines</h1>
+        <a href="{{ url_for('add_fine_view') }}" class="btn-primary">
+            <i class="fas fa-plus mr-2"></i> Issue Fine
+        </a>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Unpaid Fines -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="bg-red-50 px-4 py-3 border-b">
+                <h2 class="text-lg font-bold text-red-700">Unpaid Fines</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="text-left py-2 px-3">Member</th>
+                            <th class="text-left py-2 px-3">Reason</th>
+                            <th class="text-right py-2 px-3">Amount</th>
+                            <th class="text-left py-2 px-3">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fine in unpaid_fines %}
+                        <tr class="border-t">
+                            <td class="py-2 px-3">{{ fine.member_name }}</td>
+                            <td class="py-2 px-3">{{ fine.reason }}</td>
+                            <td class="py-2 px-3 text-right font-bold text-red-600">KES {{ fine.amount }}</td>
+                            <td class="py-2 px-3">
+                                <form method="POST" action="{{ url_for('pay_fine_view', fine_id=fine.id) }}" style="display:inline;">
+                                    <button type="submit" class="bg-green-500 text-white px-2 py-1 rounded text-sm hover:bg-green-600">Pay</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-gray-500 py-4">No unpaid fines</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- All Fines -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="bg-gray-50 px-4 py-3 border-b">
+                <h2 class="text-lg font-bold text-gray-700">All Fines History</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="text-left py-2 px-3">Member</th>
+                            <th class="text-left py-2 px-3">Reason</th>
+                            <th class="text-right py-2 px-3">Amount</th>
+                            <th class="text-left py-2 px-3">Status</th>
+                         </tr>
+                    </thead>
+                    <tbody>
+                        {% for fine in fines %}
+                        <tr class="border-t">
+                            <td class="py-2 px-3">{{ fine.member_name }}</td>
+                            <td class="py-2 px-3">{{ fine.reason }}</td>
+                            <td class="py-2 px-3 text-right">KES {{ fine.amount }}</td>
+                            <td class="py-2 px-3">
+                                {% if fine.paid_status %}
+                                <span class="badge badge-success">Paid</span>
+                                {% else %}
+                                <span class="badge badge-danger">Unpaid</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-gray-500 py-4">No fines recorded</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

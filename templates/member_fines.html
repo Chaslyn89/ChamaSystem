@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}My Fines - ChamaLedger{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">My Fines</h1>
+    </div>
+    
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-3 px-4">Date Issued</th>
+                        <th class="text-left py-3 px-4">Reason</th>
+                        <th class="text-right py-3 px-4">Amount (KES)</th>
+                        <th class="text-left py-3 px-4">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fine in fines %}
+                    <tr class="border-t hover:bg-gray-50 transition">
+                        <td class="py-3 px-4">{{ fine.created_at[:10] if fine.created_at else '-' }}</td>
+                        <td class="py-3 px-4">{{ fine.reason }}</td>
+                        <td class="py-3 px-4 text-right font-bold text-red-600">KES {{ "{:,.0f}".format(fine.amount) }}</td>
+                        <td class="py-3 px-4">
+                            {% if fine.paid_status %}
+                            <span class="badge badge-success">Paid</span>
+                            {% else %}
+                            <span class="badge badge-danger">Unpaid</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr class="border-t">
+                        <td colspan="4" class="text-center text-gray-500 py-8">
+                            <i class="fas fa-check-circle text-green-500 text-3xl mb-2 block"></i>
+                            No fines recorded. Good standing!
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="{{ url_for('member_dashboard') }}" class="text-emerald-600 hover:underline">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

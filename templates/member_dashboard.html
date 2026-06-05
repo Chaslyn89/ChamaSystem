@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}My Dashboard - ChamaLedger{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <h1 class="text-3xl font-bold text-gray-800">Welcome, {{ member.member.name }}</h1>
+    
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">My Balance</p>
+                    <p class="text-2xl font-bold text-emerald-600">KES {{ "{:,.0f}".format(member.member.current_balance) }}</p>
+                </div>
+                <div class="bg-emerald-100 p-3 rounded-full">
+                    <i class="fas fa-wallet text-emerald-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Total Contributions</p>
+                    <p class="text-2xl font-bold text-blue-600">KES {{ "{:,.0f}".format(member.member.total_contributions) }}</p>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <i class="fas fa-money-bill-wave text-blue-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Active Loans</p>
+                    <p class="text-2xl font-bold text-orange-600">KES {{ "{:,.0f}".format(member.member.total_payouts) }}</p>
+                </div>
+                <div class="bg-orange-100 p-3 rounded-full">
+                    <i class="fas fa-hand-holding-usd text-orange-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Unpaid Fines</p>
+                    <p class="text-2xl font-bold text-red-600">KES {{ "{:,.0f}".format(member.member.total_fines_paid) }}</p>
+                </div>
+                <div class="bg-red-100 p-3 rounded-full">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <a href="{{ url_for('request_loan_view') }}" class="bg-emerald-600 text-white rounded-2xl p-6 text-center hover:bg-emerald-700 transition">
+            <i class="fas fa-hand-holding-usd text-3xl mb-2"></i>
+            <p class="font-semibold">Request Loan</p>
+        </a>
+        <a href="{{ url_for('request_payout_view') }}" class="bg-blue-600 text-white rounded-2xl p-6 text-center hover:bg-blue-700 transition">
+            <i class="fas fa-arrow-right text-3xl mb-2"></i>
+            <p class="font-semibold">Request Payout</p>
+        </a>
+        <a href="{{ url_for('member_profile', member_id=member.member.id) }}" class="bg-gray-700 text-white rounded-2xl p-6 text-center hover:bg-gray-800 transition">
+            <i class="fas fa-user text-3xl mb-2"></i>
+            <p class="font-semibold">My Profile</p>
+        </a>
+    </div>
+    
+    <!-- Pending Loan Requests -->
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        <div class="bg-yellow-50 px-6 py-4 border-b">
+            <h2 class="text-lg font-bold text-yellow-700">My Pending Loan Requests</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-3 px-4">Date</th>
+                        <th class="text-right py-3 px-4">Amount</th>
+                        <th class="text-right py-3 px-4">Interest</th>
+                        <th class="text-right py-3 px-4">Total Due</th>
+                        <th class="text-left py-3 px-4">Status</th>
+                        <th class="text-left py-3 px-4">Due Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loan in member.loans if loan.status == 'pending' %}
+                    <tr class="border-t">
+                        <td class="py-3 px-4">{{ loan.issue_date }}</td>
+                        <td class="py-3 px-4 text-right">KES {{ "{:,.0f}".format(loan.loan_amount) }}</td>
+                        <td class="py-3 px-4 text-right">{{ loan.interest_rate }}%</td>
+                        <td class="py-3 px-4 text-right">KES {{ "{:,.0f}".format(loan.amount_due) }}</td>
+                        <td class="py-3 px-4">
+                            <span class="badge badge-warning">Pending Approval</span>
+                        </td>
+                        <td class="py-3 px-4">{{ loan.due_date }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-gray-500 py-8">No pending loan requests</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Active Loans -->
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        <div class="bg-green-50 px-6 py-4 border-b">
+            <h2 class="text-lg font-bold text-green-700">My Active Loans</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-3 px-4">Date</th>
+                        <th class="text-right py-3 px-4">Amount</th>
+                        <th class="text-right py-3 px-4">Paid</th>
+                        <th class="text-right py-3 px-4">Remaining</th>
+                        <th class="text-left py-3 px-4">Status</th>
+                        <th class="text-left py-3 px-4">Due Date</th>
+                        <th class="text-left py-3 px-4">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loan in member.loans if loan.status == 'approved' %}
+                    <tr class="border-t">
+                        <td class="py-3 px-4">{{ loan.issue_date }}</td>
+                        <td class="py-3 px-4 text-right">KES {{ "{:,.0f}".format(loan.loan_amount) }}</td>
+                        <td class="py-3 px-4 text-right">KES {{ "{:,.0f}".format(loan.amount_paid) }}</td>
+                        <td class="py-3 px-4 text-right text-red-600">KES {{ "{:,.0f}".format(loan.remaining_balance) }}</td>
+                        <td class="py-3 px-4">
+                            <span class="badge badge-success">Active</span>
+                        </td>
+                        <td class="py-3 px-4">{{ loan.due_date }}</td>
+                        <td class="py-3 px-4">
+                            <form method="POST" action="{{ url_for('repay_loan_view', loan_id=loan.id) }}" class="inline-flex gap-2">
+                                <input type="number" name="amount" placeholder="Amount" class="w-24 border rounded-lg px-2 py-1 text-sm" required>
+                                <button type="submit" class="bg-emerald-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-emerald-700">Repay</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-gray-500 py-8">No active loans</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Recent Contributions -->
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        <div class="bg-gray-50 px-6 py-4 border-b">
+            <h2 class="text-lg font-bold text-gray-700">My Recent Contributions</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-3 px-4">Date</th>
+                        <th class="text-right py-3 px-4">Amount</th>
+                        <th class="text-left py-3 px-4">Method</th>
+                        <th class="text-left py-3 px-4">Receipt No.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contrib in member.contributions[:10] %}
+                    <tr class="border-t">
+                        <td class="py-3 px-4">{{ contrib.contribution_date }}</td>
+                        <td class="py-3 px-4 text-right font-bold text-emerald-600">KES {{ "{:,.0f}".format(contrib.amount) }}</td>
+                        <td class="py-3 px-4">{{ contrib.payment_method }}</td>
+                        <td class="py-3 px-4">{{ contrib.receipt_number }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center text-gray-500 py-8">No contributions yet</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

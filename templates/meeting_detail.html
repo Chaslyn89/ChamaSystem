@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Meeting Details - ChamaLedger{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">Meeting Details</h1>
+        <a href="{{ url_for('meetings') }}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Meetings
+        </a>
+    </div>
+    
+    <!-- Meeting Info -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <p class="text-sm text-gray-500">Date</p>
+                <p class="text-lg font-semibold">{{ meeting.meeting_date }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Venue</p>
+                <p class="text-lg font-semibold">{{ meeting.venue }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Status</p>
+                <span class="badge {% if meeting.status == 'upcoming' %}badge-success{% else %}badge-info{% endif %}">
+                    {{ meeting.status }}
+                </span>
+            </div>
+        </div>
+        
+        {% if meeting.agenda %}
+        <div class="mt-4 pt-4 border-t">
+            <p class="text-sm text-gray-500">Agenda</p>
+            <p class="text-gray-700 whitespace-pre-wrap">{{ meeting.agenda }}</p>
+        </div>
+        {% endif %}
+        
+        <!-- Minutes Form -->
+        <div class="mt-6 pt-4 border-t">
+            <form method="POST" action="{{ url_for('save_minutes', meeting_id=meeting.id) }}">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Meeting Minutes</label>
+                <textarea name="minutes" rows="5" class="w-full border border-gray-300 rounded-lg px-4 py-2" placeholder="Record what was discussed...">{{ meeting.minutes or '' }}</textarea>
+                <button type="submit" class="btn-primary mt-3">Save Minutes</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Attendance Section -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Mark Attendance</h2>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-2 px-3">Member</th>
+                        <th class="text-left py-2 px-3">Status</th>
+                        <th class="text-left py-2 px-3">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member in members %}
+                    <tr class="border-t">
+                        <td class="py-2 px-3">{{ member.name }}</td>
+                        <td class="py-2 px-3">
+                            {% set attendance_record = meeting.attendance|selectattr("member_id", "equalto", member.id)|first %}
+                            {% if attendance_record and attendance_record.attended == 1 %}
+                            <span class="badge badge-success">Present</span>
+                            {% else %}
+                            <span class="badge badge-danger">Absent</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-2 px-3">
+                            <form method="POST" action="{{ url_for('record_attendance', meeting_id=meeting.id) }}" class="inline">
+                                <input type="hidden" name="member_id" value="{{ member.id }}">
+                                <button type="submit" name="attended" value="1" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 mr-1">Present</button>
+                                <button type="submit" name="attended" value="0" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">Absent</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% if summary %}
+        <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+            <p class="text-sm">{{ summary.present_count }} present, {{ summary.absent_count }} absent out of {{ summary.total_members }} members</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}My Payouts - ChamaLedger{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">My Payouts</h1>
+        <a href="{{ url_for('request_payout_view') }}" class="btn-primary">
+            <i class="fas fa-plus mr-2"></i> Request Payout
+        </a>
+    </div>
+    
+    <!-- Pending Payouts -->
+    {% set pending_payouts = payouts|selectattr('status', 'equalto', 'pending')|list %}
+    {% if pending_payouts %}
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        <div class="bg-yellow-50 px-6 py-4 border-b">
+            <h2 class="text-lg font-bold text-yellow-700">Pending Requests</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-3 px-4">Request Date</th>
+                        <th class="text-right py-3 px-4">Amount (KES)</th>
+                        <th class="text-left py-3 px-4">Purpose</th>
+                        <th class="text-left py-3 px-4">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payout in pending_payouts %}
+                    <tr class="border-t">
+                        <td class="py-3 px-4">{{ payout.created_at[:10] if payout.created_at else '-' }}</td>
+                        <td class="py-3 px-4 text-right font-bold">KES {{ "{:,.0f}".format(payout.amount) }}</td>
+                        <td class="py-3 px-4">{{ payout.purpose }}</td>
+                        <td class="py-3 px-4">
+                            <span class="badge badge-warning">Pending</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Approved Payouts -->
+    {% set approved_payouts = payouts|selectattr('status', 'equalto', 'approved')|list %}
+    {% if approved_payouts %}
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        <div class="bg-green-50 px-6 py-4 border-b">
+            <h2 class="text-lg font-bold text-green-700">Approved Payouts</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-3 px-4">Payout Date</th>
+                        <th class="text-right py-3 px-4">Amount (KES)</th>
+                        <th class="text-left py-3 px-4">Purpose</th>
+                        <th class="text-left py-3 px-4">Approved By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payout in approved_payouts %}
+                    <tr class="border-t">
+                        <td class="py-3 px-4">{{ payout.payout_date or payout.created_at[:10] }}</td>
+                        <td class="py-3 px-4 text-right font-bold text-emerald-600">KES {{ "{:,.0f}".format(payout.amount) }}</td>
+                        <td class="py-3 px-4">{{ payout.purpose }}</td>
+                        <td class="py-3 px-4">{{ payout.approved_by or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Rejected Payouts -->
+    {% set rejected_payouts = payouts|selectattr('status', 'equalto', 'rejected')|list %}
+    {% if rejected_payouts %}
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        <div class="bg-red-50 px-6 py-4 border-b">
+            <h2 class="text-lg font-bold text-red-700">Rejected Payouts</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-3 px-4">Request Date</th>
+                        <th class="text-right py-3 px-4">Amount (KES)</th>
+                        <th class="text-left py-3 px-4">Purpose</th>
+                    </td>
+                </thead>
+                <tbody>
+                    {% for payout in rejected_payouts %}
+                    <tr class="border-t">
+                        <td class="py-3 px-4">{{ payout.created_at[:10] if payout.created_at else '-' }}</td>
+                        <td class="py-3 px-4 text-right">KES {{ "{:,.0f}".format(payout.amount) }}</td>
+                        <td class="py-3 px-4">{{ payout.purpose }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if not pending_payouts and not approved_payouts and not rejected_payouts %}
+    <div class="bg-white rounded-2xl shadow-sm p-8 text-center border border-gray-100">
+        <i class="fas fa-arrow-right text-5xl text-gray-300 mb-3"></i>
+        <p class="text-gray-500">You have no payout requests.</p>
+        <a href="{{ url_for('request_payout_view') }}" class="text-emerald-600 hover:underline mt-2 inline-block">Request your first payout</a>
+    </div>
+    {% endif %}
+    
+    <div class="mt-4">
+        <a href="{{ url_for('member_dashboard') }}" class="text-emerald-600 hover:underline">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

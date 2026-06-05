@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Contributions - ChamaLedger{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">Contributions</h1>
+        <a href="{{ url_for('add_contribution_view') }}" class="btn-primary">
+            <i class="fas fa-plus mr-2"></i> Add Contribution
+        </a>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-3 px-4">Date</th>
+                        <th class="text-left py-3 px-4">Member</th>
+                        <th class="text-right py-3 px-4">Amount (KES)</th>
+                        <th class="text-left py-3 px-4">Method</th>
+                        <th class="text-left py-3 px-4">Receipt No.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contrib in contributions %}
+                    <tr class="border-t">
+                        <td class="py-3 px-4">{{ contrib.contribution_date }}</td>
+                        <td class="py-3 px-4 font-medium">{{ contrib.member_name }}</td>
+                        <td class="py-3 px-4 text-right font-bold text-green-600">KES {{ "{:,.0f}".format(contrib.amount) }}</td>
+                        <td class="py-3 px-4">{{ contrib.payment_method }}</td>
+                        <td class="py-3 px-4">{{ contrib.receipt_number }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-gray-500 py-8">No contributions yet. <a href="{{ url_for('add_contribution_view') }}" class="text-blue-600">Add your first contribution</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

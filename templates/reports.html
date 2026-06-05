@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - ChamaLedger{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <h1 class="text-3xl font-bold text-gray-800">Reports</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Member Statement -->
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <div class="flex items-center justify-between mb-4">
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <i class="fas fa-user text-blue-600 text-xl"></i>
+                </div>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Member Statement</h2>
+            <p class="text-gray-500 text-sm mb-4">View individual member contribution history and transactions</p>
+            <a href="{{ url_for('members') }}" class="btn-primary inline-block w-full text-center">Generate Statement</a>
+        </div>
+        
+        <!-- Contributions by Date -->
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <div class="flex items-center justify-between mb-4">
+                <div class="bg-green-100 p-3 rounded-full">
+                    <i class="fas fa-calendar-alt text-green-600 text-xl"></i>
+                </div>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Contributions by Date</h2>
+            <p class="text-gray-500 text-sm mb-4">Filter contributions by date range</p>
+            <a href="{{ url_for('contributions_by_date') }}" class="btn-primary inline-block w-full text-center">View Report</a>
+        </div>
+        
+        <!-- Loans Report -->
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <div class="flex items-center justify-between mb-4">
+                <div class="bg-orange-100 p-3 rounded-full">
+                    <i class="fas fa-hand-holding-usd text-orange-600 text-xl"></i>
+                </div>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Loans Report</h2>
+            <p class="text-gray-500 text-sm mb-4">View all loans, active loans, and repayment status</p>
+            <a href="{{ url_for('loans') }}" class="btn-primary inline-block w-full text-center">View Loans</a>
+        </div>
+        
+        <!-- Fines Report -->
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <div class="flex items-center justify-between mb-4">
+                <div class="bg-red-100 p-3 rounded-full">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                </div>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Fines Report</h2>
+            <p class="text-gray-500 text-sm mb-4">View all fines and unpaid fines</p>
+            <a href="{{ url_for('fines') }}" class="btn-primary inline-block w-full text-center">View Fines</a>
+        </div>
+        
+        <!-- Expenses Report -->
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <div class="flex items-center justify-between mb-4">
+                <div class="bg-purple-100 p-3 rounded-full">
+                    <i class="fas fa-receipt text-purple-600 text-xl"></i>
+                </div>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Expenses Report</h2>
+            <p class="text-gray-500 text-sm mb-4">View all chama expenses by category</p>
+            <a href="{{ url_for('expenses') }}" class="btn-primary inline-block w-full text-center">View Expenses</a>
+        </div>
+        
+        <!-- Payouts Report -->
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <div class="flex items-center justify-between mb-4">
+                <div class="bg-yellow-100 p-3 rounded-full">
+                    <i class="fas fa-arrow-right text-yellow-600 text-xl"></i>
+                </div>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Payouts Report</h2>
+            <p class="text-gray-500 text-sm mb-4">View all payout requests and approvals</p>
+            <a href="{{ url_for('payouts') }}" class="btn-primary inline-block w-full text-center">View Payouts</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Meetings - ChamaLedger{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">Meetings</h1>
+        <a href="{{ url_for('add_meeting_view') }}" class="btn-primary">
+            <i class="fas fa-plus mr-2"></i> Schedule Meeting
+        </a>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="text-left py-3 px-4">Date</th>
+                        <th class="text-left py-3 px-4">Venue</th>
+                        <th class="text-left py-3 px-4">Agenda</th>
+                        <th class="text-left py-3 px-4">Status</th>
+                        <th class="text-left py-3 px-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for meeting in meetings %}
+                    <tr class="border-t">
+                        <td class="py-3 px-4">{{ meeting.meeting_date }}</td>
+                        <td class="py-3 px-4">{{ meeting.venue }}</td>
+                        <td class="py-3 px-4">{{ meeting.agenda|truncate(50) or '-' }}</td>
+                        <td class="py-3 px-4">
+                            {% if meeting.status == 'upcoming' %}
+                            <span class="badge badge-success">Upcoming</span>
+                            {% else %}
+                            <span class="badge badge-info">{{ meeting.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4">
+                            <a href="{{ url_for('meeting_detail', meeting_id=meeting.id) }}" class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-gray-500 py-8">No meetings scheduled. <a href="{{ url_for('add_meeting_view') }}" class="text-blue-600">Schedule your first meeting</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

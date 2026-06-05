@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Member - ChamaLedger{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Edit Member</h1>
+    
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <form method="POST">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                    <input type="text" name="name" required value="{{ member.name }}" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                    <input type="tel" name="phone" required value="{{ member.phone }}" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email (Optional)</label>
+                    <input type="email" name="email" value="{{ member.email or '' }}" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Notes (Optional)</label>
+                    <textarea name="notes" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2">{{ member.notes or '' }}</textarea>
+                </div>
+                
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="btn-primary">Update Member</button>
+                    <a href="{{ url_for('members') }}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
