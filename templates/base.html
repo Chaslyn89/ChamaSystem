@@ -45,10 +45,14 @@
         </div>
         
         <nav class="p-4 space-y-1">
+            <!-- Dashboard - Both roles -->
             <a href="{{ url_for('dashboard') }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-emerald-600 hover:text-white transition-all duration-200 {% if request.endpoint == 'dashboard' %}bg-emerald-600 text-white{% endif %}">
                 <i class="fas fa-chart-line w-5"></i>
                 <span>Dashboard</span>
             </a>
+            
+            {% if session.role == 'treasurer' %}
+            <!-- Treasurer Only -->
             <a href="{{ url_for('members') }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-emerald-600 hover:text-white transition-all duration-200 {% if request.endpoint == 'members' %}bg-emerald-600 text-white{% endif %}">
                 <i class="fas fa-users w-5"></i>
                 <span>Members</span>
@@ -81,13 +85,45 @@
                 <i class="fas fa-file-alt w-5"></i>
                 <span>Reports</span>
             </a>
+            
+            {% elif session.role == 'member' %}
+            <!-- Member Only -->
+            <a href="{{ url_for('member_profile', member_id=session.get('member_id', 0)) }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-emerald-600 hover:text-white transition-all duration-200">
+                <i class="fas fa-user w-5"></i>
+                <span>My Profile</span>
+            </a>
+            <a href="{{ url_for('member_contributions') }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-emerald-600 hover:text-white transition-all duration-200">
+                <i class="fas fa-money-bill-wave w-5"></i>
+                <span>My Contributions</span>
+            </a>
+            <a href="{{ url_for('member_meetings') }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-emerald-600 hover:text-white transition-all duration-200">
+                <i class="fas fa-calendar-alt w-5"></i>
+                <span>Meetings</span>
+            </a>
+            <a href="{{ url_for('member_loans') }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-emerald-600 hover:text-white transition-all duration-200">
+                <i class="fas fa-hand-holding-usd w-5"></i>
+                <span>My Loans</span>
+            </a>
+            <a href="{{ url_for('member_fines') }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-emerald-600 hover:text-white transition-all duration-200">
+                <i class="fas fa-exclamation-triangle w-5"></i>
+                <span>My Fines</span>
+            </a>
+            <a href="{{ url_for('member_payouts') }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-emerald-600 hover:text-white transition-all duration-200">
+                <i class="fas fa-arrow-right w-5"></i>
+                <span>My Payouts</span>
+            </a>
+            <a href="{{ url_for('member_statement_view') }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-emerald-600 hover:text-white transition-all duration-200">
+                <i class="fas fa-file-alt w-5"></i>
+                <span>My Statement</span>
+            </a>
+            {% endif %}
         </nav>
         
         <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-300">{{ session.get('username', 'User') }}</p>
-                    <p class="text-xs text-gray-500">{{ session.get('role', 'Treasurer') }}</p>
+                    <p class="text-xs text-gray-500">{{ session.get('role', 'Treasurer')|title }}</p>
                 </div>
                 <a href="{{ url_for('logout') }}" class="text-red-400 hover:text-red-300 transition">
                     <i class="fas fa-sign-out-alt"></i>
