@@ -3,181 +3,142 @@
 {% block title %}My Dashboard - ChamaLedger{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
-    <h1 class="text-3xl font-bold text-gray-800">Welcome, {{ member.member.name }}</h1>
+<div style="width: 100%; max-width: 100%; overflow-x: hidden;">
     
-    <!-- Stats Cards - Fixed for mobile -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="flex justify-between items-start">
+    <h1 style="font-size: 20px; font-weight: bold; margin-bottom: 16px;">Welcome, {{ member.member.name }}</h1>
+    
+    <!-- Stats Cards - Stack vertically, full width, no scroll -->
+    <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+        
+        <!-- Card 1: Balance -->
+        <div style="background: white; border-radius: 16px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <p class="text-sm text-gray-500">My Balance</p>
-                    <p class="text-2xl font-bold text-emerald-600">KES {{ "{:,.0f}".format(member.member.current_balance) }}</p>
+                    <p style="font-size: 12px; color: #64748B; margin-bottom: 4px;">My Balance</p>
+                    <p style="font-size: 20px; font-weight: bold; color: #10B981;">KES {{ "{:,.0f}".format(member.member.current_balance) }}</p>
                 </div>
-                <div class="icon-circle bg-emerald-100">
-                    <i class="fas fa-wallet text-emerald-600"></i>
+                <div style="width: 40px; height: 40px; border-radius: 20px; background: #D1FAE5; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-wallet" style="color: #10B981; font-size: 18px;"></i>
                 </div>
             </div>
         </div>
         
-        <div class="stat-card">
-            <div class="flex justify-between items-start">
+        <!-- Card 2: Contributions -->
+        <div style="background: white; border-radius: 16px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <p class="text-sm text-gray-500">Total Contributions</p>
-                    <p class="text-2xl font-bold text-blue-600">KES {{ "{:,.0f}".format(member.member.total_contributions) }}</p>
+                    <p style="font-size: 12px; color: #64748B; margin-bottom: 4px;">Total Contributions</p>
+                    <p style="font-size: 20px; font-weight: bold; color: #3B82F6;">KES {{ "{:,.0f}".format(member.member.total_contributions) }}</p>
                 </div>
-                <div class="icon-circle bg-blue-100">
-                    <i class="fas fa-money-bill-wave text-blue-600"></i>
+                <div style="width: 40px; height: 40px; border-radius: 20px; background: #DBEAFE; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-money-bill-wave" style="color: #3B82F6; font-size: 18px;"></i>
                 </div>
             </div>
         </div>
         
-        <div class="stat-card">
-            <div class="flex justify-between items-start">
+        <!-- Card 3: Loans -->
+        <div style="background: white; border-radius: 16px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <p class="text-sm text-gray-500">Active Loans</p>
-                    <p class="text-2xl font-bold text-orange-600">KES {{ "{:,.0f}".format(member.member.total_payouts) }}</p>
+                    <p style="font-size: 12px; color: #64748B; margin-bottom: 4px;">Active Loans</p>
+                    <p style="font-size: 20px; font-weight: bold; color: #F59E0B;">KES {{ "{:,.0f}".format(member.member.total_payouts) }}</p>
                 </div>
-                <div class="icon-circle bg-orange-100">
-                    <i class="fas fa-hand-holding-usd text-orange-600"></i>
+                <div style="width: 40px; height: 40px; border-radius: 20px; background: #FEF3C7; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-hand-holding-usd" style="color: #F59E0B; font-size: 18px;"></i>
                 </div>
             </div>
         </div>
         
-        <div class="stat-card">
-            <div class="flex justify-between items-start">
+        <!-- Card 4: Fines -->
+        <div style="background: white; border-radius: 16px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <p class="text-sm text-gray-500">Unpaid Fines</p>
-                    <p class="text-2xl font-bold text-red-600">KES {{ "{:,.0f}".format(member.member.total_fines_paid) }}</p>
+                    <p style="font-size: 12px; color: #64748B; margin-bottom: 4px;">Unpaid Fines</p>
+                    <p style="font-size: 20px; font-weight: bold; color: #EF4444;">KES {{ "{:,.0f}".format(member.member.total_fines_paid) }}</p>
                 </div>
-                <div class="icon-circle bg-red-100">
-                    <i class="fas fa-exclamation-triangle text-red-600"></i>
+                <div style="width: 40px; height: 40px; border-radius: 20px; background: #FEE2E2; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-exclamation-triangle" style="color: #EF4444; font-size: 18px;"></i>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Quick Actions -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <a href="{{ url_for('request_loan_view') }}" class="btn-primary text-center">
-            <i class="fas fa-hand-holding-usd mr-2"></i> Request Loan
-        </a>
-        <a href="{{ url_for('request_payout_view') }}" class="btn-primary text-center" style="background-color: #3B82F6;">
-            <i class="fas fa-arrow-right mr-2"></i> Request Payout
-        </a>
-        <a href="{{ url_for('member_profile', member_id=member.member.id) }}" class="btn-secondary text-center">
-            <i class="fas fa-user mr-2"></i> My Profile
-        </a>
+    <!-- Quick Actions - Stack vertically -->
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+        <a href="{{ url_for('request_loan_view') }}" style="background-color: #10B981; color: white; text-align: center; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: 500;">Request Loan</a>
+        <a href="{{ url_for('request_payout_view') }}" style="background-color: #3B82F6; color: white; text-align: center; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: 500;">Request Payout</a>
+        <a href="{{ url_for('member_profile', member_id=member.member.id)" style="background-color: #0F172A; color: white; text-align: center; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: 500;">My Profile</a>
     </div>
     
-    <!-- Pending Loan Requests -->
+    <!-- Pending Loans Section -->
     {% set pending_loans = member.loans|selectattr('status', 'equalto', 'pending')|list %}
     {% if pending_loans %}
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="bg-yellow-50 px-6 py-4 border-b">
-            <h2 class="text-lg font-bold text-yellow-700">My Pending Loan Requests</h2>
+    <div style="background: white; border-radius: 16px; padding: 12px; margin-bottom: 20px;">
+        <h2 style="font-size: 16px; font-weight: bold; color: #D97706; margin-bottom: 12px;">Pending Loan Requests</h2>
+        {% for loan in pending_loans %}
+        <div style="border-bottom: 1px solid #E2E8F0; padding: 10px 0;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="font-size: 12px; color: #64748B;">Amount:</span>
+                <span style="font-size: 14px; font-weight: bold;">KES {{ "{:,.0f}".format(loan.loan_amount) }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="font-size: 12px; color: #64748B;">Interest:</span>
+                <span style="font-size: 14px;">{{ loan.interest_rate }}%</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="font-size: 12px; color: #64748B;">Due Date:</span>
+                <span style="font-size: 14px;">{{ loan.due_date }}</span>
+            </div>
         </div>
-        <div class="table-container overflow-x-auto">
-            <table class="min-w-full">
-                <thead>
-                    <tr class="bg-gray-50">
-                        <th class="text-left py-3 px-4">Date</th>
-                        <th class="text-right py-3 px-4">Amount</th>
-                        <th class="text-right py-3 px-4">Interest</th>
-                        <th class="text-right py-3 px-4">Total Due</th>
-                        <th class="text-left py-3 px-4">Due Date</th>
-                        <th class="text-left py-3 px-4">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for loan in pending_loans %}
-                    <tr class="border-t">
-                        <td class="py-3 px-4">{{ loan.issue_date }}</td>
-                        <td class="py-3 px-4 text-right">KES {{ "{:,.0f}".format(loan.loan_amount) }}</td>
-                        <td class="py-3 px-4 text-right">{{ loan.interest_rate }}%</td>
-                        <td class="py-3 px-4 text-right">KES {{ "{:,.0f}".format(loan.amount_due) }}</td>
-                        <td class="py-3 px-4">{{ loan.due_date }}</td>
-                        <td class="py-3 px-4">
-                            <span class="badge badge-warning">Pending</span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+        {% endfor %}
     </div>
     {% endif %}
     
-    <!-- Active Loans -->
+    <!-- Active Loans Section -->
     {% set active_loans = member.loans|selectattr('status', 'equalto', 'approved')|list %}
     {% if active_loans %}
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="bg-green-50 px-6 py-4 border-b">
-            <h2 class="text-lg font-bold text-green-700">My Active Loans</h2>
+    <div style="background: white; border-radius: 16px; padding: 12px; margin-bottom: 20px;">
+        <h2 style="font-size: 16px; font-weight: bold; color: #065F46; margin-bottom: 12px;">Active Loans</h2>
+        {% for loan in active_loans %}
+        <div style="border-bottom: 1px solid #E2E8F0; padding: 10px 0;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="font-size: 12px; color: #64748B;">Amount:</span>
+                <span style="font-size: 14px;">KES {{ "{:,.0f}".format(loan.loan_amount) }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="font-size: 12px; color: #64748B;">Remaining:</span>
+                <span style="font-size: 14px; color: #EF4444;">KES {{ "{:,.0f}".format(loan.remaining_balance) }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                <span style="font-size: 12px; color: #64748B;">Repay:</span>
+                <form method="POST" action="{{ url_for('repay_loan_view', loan_id=loan.id) }}" style="display: flex; gap: 8px;">
+                    <input type="number" name="amount" placeholder="Amount" style="width: 100px; padding: 8px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 12px;" required>
+                    <button type="submit" style="background-color: #10B981; color: white; padding: 8px 12px; border: none; border-radius: 8px; font-size: 12px;">Pay</button>
+                </form>
+            </div>
         </div>
-        <div class="table-container overflow-x-auto">
-            <table class="min-w-full">
-                <thead>
-                    <tr class="bg-gray-50">
-                        <th class="text-left py-3 px-4">Date</th>
-                        <th class="text-right py-3 px-4">Amount</th>
-                        <th class="text-right py-3 px-4">Paid</th>
-                        <th class="text-right py-3 px-4">Remaining</th>
-                        <th class="text-left py-3 px-4">Due Date</th>
-                        <th class="text-left py-3 px-4">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for loan in active_loans %}
-                    <tr class="border-t">
-                        <td class="py-3 px-4">{{ loan.issue_date }}</td>
-                        <td class="py-3 px-4 text-right">KES {{ "{:,.0f}".format(loan.loan_amount) }}</td>
-                        <td class="py-3 px-4 text-right">KES {{ "{:,.0f}".format(loan.amount_paid) }}</td>
-                        <td class="py-3 px-4 text-right text-red-600">KES {{ "{:,.0f}".format(loan.remaining_balance) }}</td>
-                        <td class="py-3 px-4">{{ loan.due_date }}</td>
-                        <td class="py-3 px-4">
-                            <form method="POST" action="{{ url_for('repay_loan_view', loan_id=loan.id) }}" class="flex flex-col sm:flex-row gap-2">
-                                <input type="number" name="amount" placeholder="Amount" class="w-32 border border-gray-300 rounded-lg px-3 py-1 text-sm" required>
-                                <button type="submit" class="bg-emerald-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-emerald-700">Repay</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+        {% endfor %}
     </div>
     {% endif %}
     
     <!-- Recent Contributions -->
     {% if member.contributions %}
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="bg-gray-50 px-6 py-4 border-b">
-            <h2 class="text-lg font-bold text-gray-700">My Recent Contributions</h2>
+    <div style="background: white; border-radius: 16px; padding: 12px; margin-bottom: 20px;">
+        <h2 style="font-size: 16px; font-weight: bold; color: #1E293B; margin-bottom: 12px;">Recent Contributions</h2>
+        {% for contrib in member.contributions[:5] %}
+        <div style="border-bottom: 1px solid #E2E8F0; padding: 10px 0;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="font-size: 12px; color: #64748B;">Date:</span>
+                <span style="font-size: 14px;">{{ contrib.contribution_date }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="font-size: 12px; color: #64748B;">Amount:</span>
+                <span style="font-size: 14px; font-weight: bold; color: #10B981;">KES {{ "{:,.0f}".format(contrib.amount) }}</span>
+            </div>
         </div>
-        <div class="table-container overflow-x-auto">
-            <table class="min-w-full">
-                <thead>
-                    <tr class="bg-gray-50">
-                        <th class="text-left py-3 px-4">Date</th>
-                        <th class="text-right py-3 px-4">Amount</th>
-                        <th class="text-left py-3 px-4">Method</th>
-                        <th class="text-left py-3 px-4">Receipt No.</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for contrib in member.contributions[:5] %}
-                    <tr class="border-t">
-                        <td class="py-3 px-4">{{ contrib.contribution_date }}</td>
-                        <td class="py-3 px-4 text-right font-bold text-emerald-600">KES {{ "{:,.0f}".format(contrib.amount) }}</td>
-                        <td class="py-3 px-4">{{ contrib.payment_method|title }}</td>
-                        <td class="py-3 px-4">{{ contrib.receipt_number }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+        {% endfor %}
     </div>
     {% endif %}
+    
 </div>
 {% endblock %}
