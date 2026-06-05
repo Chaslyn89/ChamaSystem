@@ -45,14 +45,12 @@
         </div>
         
         <nav class="p-4 space-y-1">
-            <!-- Dashboard - Both roles -->
             <a href="{{ url_for('dashboard') }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-emerald-600 hover:text-white transition-all duration-200 {% if request.endpoint == 'dashboard' %}bg-emerald-600 text-white{% endif %}">
                 <i class="fas fa-chart-line w-5"></i>
                 <span>Dashboard</span>
             </a>
             
             {% if session.role == 'treasurer' %}
-            <!-- Treasurer Only -->
             <a href="{{ url_for('members') }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-emerald-600 hover:text-white transition-all duration-200 {% if request.endpoint == 'members' %}bg-emerald-600 text-white{% endif %}">
                 <i class="fas fa-users w-5"></i>
                 <span>Members</span>
@@ -87,7 +85,6 @@
             </a>
             
             {% elif session.role == 'member' %}
-            <!-- Member Only -->
             <a href="{{ url_for('member_profile', member_id=session.get('member_id', 0)) }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-emerald-600 hover:text-white transition-all duration-200">
                 <i class="fas fa-user w-5"></i>
                 <span>My Profile</span>
@@ -125,8 +122,9 @@
                     <p class="text-sm font-medium text-gray-300">{{ session.get('username', 'User') }}</p>
                     <p class="text-xs text-gray-500">{{ session.get('role', 'Treasurer')|title }}</p>
                 </div>
-                <a href="{{ url_for('logout') }}" class="text-red-400 hover:text-red-300 transition">
+                <a href="{{ url_for('logout') }}" class="text-red-400 hover:text-red-300 transition flex items-center gap-2">
                     <i class="fas fa-sign-out-alt"></i>
+                    <span class="logout-text">Logout</span>
                 </a>
             </div>
         </div>
@@ -150,6 +148,45 @@
             {% block content %}{% endblock %}
         </div>
     </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <div class="bottom-nav no-print">
+        <a href="{{ url_for('dashboard') }}">
+            <i class="fas fa-chart-line"></i>
+            <span>Home</span>
+        </a>
+        {% if session.role == 'treasurer' %}
+        <a href="{{ url_for('members') }}">
+            <i class="fas fa-users"></i>
+            <span>Members</span>
+        </a>
+        <a href="{{ url_for('contributions') }}">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Payments</span>
+        </a>
+        <a href="{{ url_for('loans') }}">
+            <i class="fas fa-hand-holding-usd"></i>
+            <span>Loans</span>
+        </a>
+        <a href="{{ url_for('reports') }}">
+            <i class="fas fa-file-alt"></i>
+            <span>Reports</span>
+        </a>
+        {% else %}
+        <a href="{{ url_for('member_contributions') }}">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Payments</span>
+        </a>
+        <a href="{{ url_for('member_loans') }}">
+            <i class="fas fa-hand-holding-usd"></i>
+            <span>Loans</span>
+        </a>
+        <a href="{{ url_for('member_profile', member_id=session.get('member_id', 0)) }}">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+        {% endif %}
+    </div>
 
     <!-- Mobile sidebar script -->
     <script>
