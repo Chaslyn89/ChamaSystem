@@ -176,7 +176,7 @@ def member_dashboard():
     return render_template('member_dashboard.html', member=member_data, stats=stats)
 
 
-# ============= MEMBER VIEWS (Limited Access) =============
+# ============= MEMBER ROUTES (for member sidebar links) =============
 
 @app.route('/member/contributions')
 @login_required
@@ -191,8 +191,8 @@ def member_contributions():
 @login_required
 @member_required
 def member_meetings():
-    all_meetings = get_all_meetings()
-    return render_template('member_meetings.html', meetings=all_meetings)
+    meetings = get_all_meetings()
+    return render_template('member_meetings.html', meetings=meetings)
 
 
 @app.route('/member/loans')
